@@ -3,7 +3,7 @@
 
 import * as React from 'react'
 
-const useLocalStorageState = (
+export const useLocalStorageState = (
   key,
   defaultValue = '',
   {serialize = JSON.stringify, deserialize = JSON.parse} = {},
