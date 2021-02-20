@@ -9,9 +9,13 @@ const Board = () => {
     JSON.parse(window.localStorage.getItem('squares')) || Array(9).fill(null),
   )
 
+  const updateLocalStorage = React.useCallback(() => {
+    window.localStorage.setItem('squares', JSON.stringify(squares))
+  }, [squares])
+
   useEffect(() => {
     updateLocalStorage()
-  }, [squares])
+  }, [squares, updateLocalStorage])
 
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
@@ -36,10 +40,6 @@ const Board = () => {
   const restart = () => {
     setSquares(Array(9).fill(null))
     updateLocalStorage()
-  }
-
-  function updateLocalStorage() {
-    window.localStorage.setItem('squares', JSON.stringify(squares))
   }
 
   return (
