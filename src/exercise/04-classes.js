@@ -2,12 +2,16 @@
 // 💯 (alternate) migrate from classes
 // http://localhost:3000/isolated/exercise/04-classes.js
 
-import * as React from 'react'
+import React, {useState, useEffect} from 'react'
 
 const Board = () => {
-  const [squares, setSquares] = React.useState(
+  const [squares, setSquares] = useState(
     JSON.parse(window.localStorage.getItem('squares')) || Array(9).fill(null),
   )
+
+  useEffect(() => {
+    updateLocalStorage()
+  }, [squares])
 
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
@@ -37,10 +41,6 @@ const Board = () => {
   function updateLocalStorage() {
     window.localStorage.setItem('squares', JSON.stringify(squares))
   }
-
-  React.useEffect(() => {
-    updateLocalStorage()
-  }, [squares])
 
   return (
     <div>
