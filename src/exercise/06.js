@@ -2,10 +2,7 @@
 // http://localhost:3000/isolated/exercise/06.js
 
 import * as React from 'react'
-// 🐨 you'll want the following additional things from '../pokemon':
-// fetchPokemon: the function we call to get the pokemon info
-// PokemonInfoFallback: the thing we show while we're loading the pokemon info
-// PokemonDataView: the stuff we use to display the pokemon info
+import {ErrorBoundary} from 'react-error-boundary'
 import {
   PokemonForm,
   fetchPokemon,
@@ -13,10 +10,20 @@ import {
   PokemonDataView,
 } from '../pokemon'
 
+function ErrorFallback({error, resetErrorBoundary}) {
+  return (
+    <div role="alert">
+      There was an error:{' '}
+      <pre style={{whiteSpace: 'normal'}}>{error.message}</pre>
+      <button onClick={resetErrorBoundary}>Try again!</button>
+    </div>
+  )
+}
+
 function PokemonInfo({pokemonName}) {
   const [state, setState] = React.useState({
     pokemon: null,
-    status: 'idle',
+    status: pokemonName ? 'pending' : 'idle',
     error: null,
   })
   const {pokemon, status, error} = state
@@ -41,12 +48,9 @@ function PokemonInfo({pokemonName}) {
   } else if (status === 'pending') {
     return <PokemonInfoFallback name={pokemonName} />
   } else if (status === 'rejected') {
-    return (
-      <div role="alert">
-        There was an error:{' '}
-        <pre style={{whiteSpace: 'normal'}}>{error.message}</pre>
-      </div>
-    )
+    // this will be handled by our error boundary
+
+    throw error
   } else if (status === 'resolved') {
     return <PokemonDataView pokemon={pokemon} />
   }
@@ -61,12 +65,22 @@ function App() {
     setPokemonName(newPokemonName)
   }
 
+  function handleReset() {
+    setPokemonName('')
+  }
+
   return (
     <div className="pokemon-info-app">
       <PokemonForm pokemonName={pokemonName} onSubmit={handleSubmit} />
       <hr />
       <div className="pokemon-info">
-        <PokemonInfo pokemonName={pokemonName} />
+        <ErrorBoundary
+          FallbackComponent={ErrorFallback}
+          onReset={handleReset}
+          resetKeys={[pokemonName]}
+        >
+          <PokemonInfo pokemonName={pokemonName} />
+        </ErrorBoundary>
       </div>
     </div>
   )
